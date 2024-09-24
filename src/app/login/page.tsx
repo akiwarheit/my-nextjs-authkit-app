@@ -1,25 +1,30 @@
-"use client";
+import { getSignInUrl, getUser, signOut } from "@workos-inc/authkit-nextjs";
 
-import { useRouter } from "next/navigation";
+export default async function LogInPage() {
+  const { user } = await getUser();
 
-const LoginPage = () => {
-  const router = useRouter();
-
-  const handleLogin = () => {
-    router.push("/api/auth/login");
-  };
+  const signInUrl = await getSignInUrl();
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-3xl mb-4">Login with WorkOS</h1>
-      <button
-        onClick={handleLogin}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-      >
-        Login
-      </button>
-    </div>
+    <main>
+      <h1>Using hosted AuthKit</h1>
+      <h2>With Next.js library</h2>
+      {user ? (
+        <>
+          <p>Welcome back {user?.firstName && `, ${user?.firstName}`}</p>
+          <form
+            action={async () => {
+              "use server";
+              await signOut();
+            }}
+          >
+            <button type="submit">Sign out</button>
+          </form>
+        </>
+      ) : (
+        <a href={signInUrl}>Sign in</a>
+      )}
+      <pre>{JSON.stringify(user, null, 2)}</pre>
+    </main>
   );
-};
-
-export default LoginPage;
+}
